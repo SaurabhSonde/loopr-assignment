@@ -5,6 +5,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Phones held sideways: camera controls move into side rails. */
+@custom-variant phone-landscape (@media (orientation: landscape) and (max-height: 32rem));
+
+@theme {
+  --animate-shutter-flash: shutter-flash 350ms ease-out forwards;
+
+  @keyframes shutter-flash {
+    from {
+      opacity: 0.8;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;

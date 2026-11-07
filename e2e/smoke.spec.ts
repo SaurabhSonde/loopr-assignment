@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('app shell loads and routes between screens', async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Camera' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Take photo' })).toBeVisible()
 
   await page.getByRole('link', { name: 'Gallery' }).click()
   await expect(page).toHaveURL(/\/gallery$/)
