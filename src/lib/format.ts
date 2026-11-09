@@ -20,6 +20,16 @@ export const megapixels = (width: number, height: number): number =>
 export const formatMegapixels = (width: number, height: number): string =>
   `${megapixels(width, height).toFixed(1)} MP`
 
+const DATE_TIME = new Intl.DateTimeFormat(undefined, {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+})
+
+/** Compact local date and time, e.g. "Nov 9, 12:21 PM". */
+export const formatDateTime = (timestamp: number) => DATE_TIME.format(timestamp)
+
 /** e.g. 4000, 3000 -> "4000 × 3000" */
 export const formatDimensions = (width: number, height: number): string =>
   `${Math.round(width)} × ${Math.round(height)}`

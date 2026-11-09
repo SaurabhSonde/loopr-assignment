@@ -1,14 +1,6 @@
 import { computeMetrics, toLuma, type ImageMetrics } from './metrics'
+import { fitWithin } from '@/lib/image'
 import { ANALYSIS_SIZE } from './thresholds'
-
-/** Fits a size within `limit` on its longest side; never upscales. */
-export const fitWithin = (width: number, height: number, limit: number) => {
-  const scale = Math.min(1, limit / Math.max(width, height))
-  return {
-    width: Math.max(1, Math.round(width * scale)),
-    height: Math.max(1, Math.round(height * scale)),
-  }
-}
 
 const context2d = (width: number, height: number) => {
   const canvas =

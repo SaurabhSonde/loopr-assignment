@@ -24,6 +24,7 @@ import { useTorch } from './hooks/useTorch'
 import { cameraError } from './lib/cameraErrors'
 import { captureStill, imageFromFile } from './lib/capture'
 import { getCameraSupport } from './lib/support'
+import { getObjectUrl } from '@/lib/objectUrl'
 
 const CameraScreen = () => {
   const navigate = useNavigate()
@@ -35,6 +36,7 @@ const CameraScreen = () => {
   const automaticCamera = useCameraStore((s) => s.selection.deviceId === null)
   const mainBackCamera = useCameraStore((s) => s.mainBackCamera)
   const setPendingCapture = usePhotoStore((s) => s.setPendingCapture)
+  const latestPhoto = usePhotoStore((s) => s.photos[0])
   const videoRef = useRef<HTMLVideoElement>(null)
   const [capturing, setCapturing] = useState(false)
   const [flashCount, setFlashCount] = useState(0)
@@ -182,10 +184,19 @@ const CameraScreen = () => {
           aria-label="Gallery"
           className={cn(
             buttonVariants({ variant: 'ghost' }),
-            'size-11 phone-landscape:order-3',
+            'size-11 overflow-hidden p-0 phone-landscape:order-3',
           )}
         >
-          <ImagesIcon className="size-6" />
+          {/* Like a native camera: the latest photo opens the gallery. */}
+          {latestPhoto?.thumbBlob ? (
+            <img
+              src={getObjectUrl(latestPhoto.thumbBlob)}
+              alt=""
+              className="size-11 rounded-lg object-cover ring-2 ring-white/70"
+            />
+          ) : (
+            <ImagesIcon className="size-6" />
+          )}
         </Link>
 
         <button

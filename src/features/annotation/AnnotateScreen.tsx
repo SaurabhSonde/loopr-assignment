@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router'
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router'
 import {
   ArrowLeftIcon,
   CopyIcon,
@@ -44,13 +44,24 @@ import { serializeAnnotations } from './lib/serialize'
 const AnnotateScreen = () => {
   const { photoId } = useParams()
   const photo = usePhotoStore((s) => s.photos.find((p) => p.id === photoId))
-  if (!photo) return <Navigate to="/" replace />
+  const loaded = usePhotoStore((s) => s.loaded)
+  if (!photo) {
+    // After a reload the saved photos arrive a moment later.
+    return loaded ? (
+      <Navigate to="/gallery" replace />
+    ) : (
+      <main className="flex h-dvh items-center justify-center bg-background text-sm text-muted-foreground">
+        Loading photo…
+      </main>
+    )
+  }
   // Keyed so switching photos starts a fresh editor (and undo history).
   return <AnnotationEditor key={photo.id} photo={photo} />
 }
 
 const AnnotationEditor = ({ photo }: { photo: Photo }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [state, dispatch] = useReducer(editorReducer, photo.id, (id) =>
     createEditorState(usePhotoStore.getState().annotations[id] ?? []),
   )
@@ -164,7 +175,11 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
           size="icon"
           className="size-11"
           aria-label="Back"
-          onClick={() => navigate('/')}
+          // Back to wherever the editor was opened from (camera or gallery);
+          // the gallery when opened directly from a link.
+          onClick={() =>
+            location.key === 'default' ? navigate('/gallery') : navigate(-1)
+          }
         >
           <ArrowLeftIcon className="size-5" />
         </Button>

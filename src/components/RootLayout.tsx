@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { ThemeProvider, useTheme } from 'next-themes'
 import { Outlet, useLocation } from 'react-router'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { usePhotoStore } from '@/store/photoStore'
 
 // Camera, review and annotate always use dark chrome so photos are judged
 // against a neutral background; everything else follows the user's theme.
@@ -18,6 +20,11 @@ const ThemedToaster = () => {
 
 export const RootLayout = () => {
   const { pathname } = useLocation()
+
+  // Read saved photos once the toaster is mounted, so storage warnings show.
+  useEffect(() => {
+    void usePhotoStore.getState().load()
+  }, [])
 
   return (
     <ThemeProvider

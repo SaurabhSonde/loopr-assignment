@@ -23,6 +23,15 @@ export type CapturedImage = {
   capturedAt: number
 }
 
+/** Fits a size within `limit` on its longest side; never upscales. */
+export const fitWithin = (width: number, height: number, limit: number) => {
+  const scale = Math.min(1, limit / Math.max(width, height))
+  return {
+    width: Math.max(1, Math.round(width * scale)),
+    height: Math.max(1, Math.round(height * scale)),
+  }
+}
+
 /** Decodes an image just enough to read its oriented dimensions. */
 export const decodeImageSize = async (
   blob: Blob,
