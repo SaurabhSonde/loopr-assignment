@@ -24,6 +24,7 @@ import { useTorch } from './hooks/useTorch'
 import { cameraError } from './lib/cameraErrors'
 import { captureStill, imageFromFile } from './lib/capture'
 import { getCameraSupport } from './lib/support'
+import { tapFeedback } from '@/lib/haptics'
 import { getObjectUrl } from '@/lib/objectUrl'
 
 const CameraScreen = () => {
@@ -72,6 +73,7 @@ const CameraScreen = () => {
     const track = camera.track
     if (!video || !track || capturing) return
     setCapturing(true)
+    tapFeedback()
     setFlashCount((count) => count + 1)
     try {
       const prefs = useCameraStore.getState()
@@ -103,6 +105,7 @@ const CameraScreen = () => {
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-black text-white select-none phone-landscape:flex-row">
+      <h1 className="sr-only">Camera</h1>
       <header className="flex items-center justify-between gap-2 px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 phone-landscape:flex-col phone-landscape:py-3 phone-landscape:pl-[max(0.75rem,env(safe-area-inset-left))]">
         <TorchToggle
           ready={live}

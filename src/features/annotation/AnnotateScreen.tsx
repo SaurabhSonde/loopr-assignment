@@ -22,6 +22,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { tapFeedback } from '@/lib/haptics'
 import { createId } from '@/lib/id'
 import { getObjectUrl } from '@/lib/objectUrl'
 import { cn } from '@/lib/utils'
@@ -98,6 +99,7 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
 
   const create = (rect: Rect) => {
     const id = createId()
+    tapFeedback()
     dispatch({ type: 'add', annotation: { id, label: null, ...rect } })
     setLabelingId(id)
   }
@@ -168,8 +170,8 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
   )
 
   return (
-    <main className="flex h-dvh flex-col bg-background text-foreground">
-      <header className="flex items-center gap-1 border-b px-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2">
+    <main className="flex h-dvh flex-col bg-background text-foreground phone-landscape:grid phone-landscape:grid-cols-[1fr_auto] phone-landscape:grid-rows-[auto_minmax(0,1fr)]">
+      <header className="flex items-center gap-1 border-b px-2 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 phone-landscape:col-span-2 phone-landscape:py-1 phone-landscape:pr-[max(0.5rem,env(safe-area-inset-right))] phone-landscape:pl-[max(0.5rem,env(safe-area-inset-left))]">
         <Button
           variant="ghost"
           size="icon"
@@ -230,7 +232,7 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
         </Button>
       </header>
 
-      <div className="flex min-h-0 flex-1">
+      <div className="flex min-h-0 flex-1 phone-landscape:pl-[env(safe-area-inset-left)]">
         <section className="relative min-h-0 min-w-0 flex-1 bg-black p-2">
           <AnnotationStage
             src={getObjectUrl(photo.blob)}
@@ -272,7 +274,7 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
         </aside>
       </div>
 
-      <footer className="flex items-center gap-2 border-t px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
+      <footer className="flex items-center gap-2 border-t px-2 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden phone-landscape:w-44 phone-landscape:flex-col phone-landscape:items-stretch phone-landscape:justify-center phone-landscape:border-t-0 phone-landscape:border-l phone-landscape:pr-[max(0.5rem,env(safe-area-inset-right))]">
         {selected ? (
           <>
             <Button
@@ -293,13 +295,18 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
             </Button>
           </>
         ) : (
-          <p className="min-w-0 flex-1 truncate px-1 text-sm text-muted-foreground">
+          <p className="min-w-0 flex-1 truncate px-1 text-sm text-muted-foreground phone-landscape:flex-none phone-landscape:text-center phone-landscape:whitespace-normal">
             Tap a box to edit it
           </p>
         )}
         <Drawer open={listOpen} onOpenChange={setListOpen}>
           <DrawerTrigger
-            render={<Button variant="outline" className="ml-auto h-11" />}
+            render={
+              <Button
+                variant="outline"
+                className="ml-auto h-11 phone-landscape:ml-0"
+              />
+            }
           >
             <ListIcon />
             Boxes

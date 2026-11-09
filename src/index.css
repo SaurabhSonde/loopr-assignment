@@ -142,5 +142,17 @@
   }
   html {
     @apply font-sans;
+    /* Feel like an app on phones: no grey tap flash, no font inflation. */
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+  body {
+    /* No pull-to-refresh or rubber-banding behind full-screen views. */
+    overscroll-behavior: none;
+  }
+  button,
+  a {
+    /* No double-tap-to-zoom delay on controls. */
+    touch-action: manipulation;
   }
 }

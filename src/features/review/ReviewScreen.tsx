@@ -84,6 +84,7 @@ const ReviewScreen = () => {
 
   return (
     <main className="flex h-dvh flex-col bg-background text-foreground lg:flex-row phone-landscape:flex-row">
+      <h1 className="sr-only">Review photo</h1>
       <section className="relative min-h-0 min-w-0 flex-1 bg-black p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <img
           src={getObjectUrl(pending.blob)}

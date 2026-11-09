@@ -80,6 +80,9 @@ test.describe('without camera access', () => {
       .first()
       .setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: PNG })
     await expect(page).toHaveURL(/\/review$/)
+    await expect(
+      page.getByRole('img', { name: 'Captured photo' }),
+    ).toBeVisible()
     const details = page.getByRole('button', { name: 'Details' })
     if (await details.isVisible()) await details.click()
     await expect(
