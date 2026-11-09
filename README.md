@@ -3,7 +3,7 @@
 A React app that takes the highest-resolution photo the device and browser allow, rates its quality, and lets you draw, label and manage bounding boxes on it. It works on phones, tablets and desktops, with touch, mouse and pen.
 
 - **Live demo:** https://loopr-assignment.vercel.app (open on a phone to use the rear camera and torch)
-- **Demo video:** _to be added_
+- **Demo video (2:40):** https://drive.google.com/file/d/1QpDCq8jy_5qwhTlCsmwmfjnpA7yvwnSF/view (real Samsung S24 footage plus a scripted walkthrough of every feature)
 - **Technical notes:** [docs/TECHNICAL_NOTES.md](docs/TECHNICAL_NOTES.md) (capture strategy, quality assessment, annotation approach)
 
 ## Features
