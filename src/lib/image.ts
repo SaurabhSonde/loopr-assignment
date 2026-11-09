@@ -1,5 +1,11 @@
 export type CaptureMethod = 'image-capture' | 'video-frame' | 'upload'
 
+export const CAPTURE_METHOD_LABELS: Record<CaptureMethod, string> = {
+  'image-capture': 'Full-resolution photo',
+  'video-frame': 'Video frame',
+  upload: 'Uploaded image',
+}
+
 /** A captured (or uploaded) photo, before it is saved to the gallery. */
 export type CapturedImage = {
   blob: Blob

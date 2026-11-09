@@ -16,7 +16,25 @@ test('captures with the camera, reviews, and retakes', async ({ page }) => {
   await shutter.click()
   await expect(page).toHaveURL(/\/review$/)
   await expect(page.getByRole('img', { name: 'Captured photo' })).toBeVisible()
-  await expect(page.getByText(/\d+ × \d+ · [\d.]+ MP/)).toBeVisible()
+
+  // The fake camera's flat green frame fails the thresholds, so the review
+  // recommends a retake but still allows using the photo.
+  await expect(
+    page.getByRole('alert').filter({ hasText: 'Retake recommended' }),
+  ).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Use anyway' })).toBeVisible()
+
+  // Full report: inline on desktop, behind "Details" on phones.
+  const details = page.getByRole('button', { name: 'Details' })
+  if (await details.isVisible()) await details.click()
+  const report = page.getByRole('region', { name: 'Image quality' })
+  await expect(report.getByText('Resolution', { exact: true })).toBeVisible()
+  // Pixel analysis (in the worker) has finished when the sharpness check shows.
+  await expect(
+    report.getByRole('listitem').filter({ hasText: /^Sharpness/ }),
+  ).toBeVisible()
+  await expect(report.getByText('Poor quality')).toBeVisible()
+  await page.keyboard.press('Escape')
 
   await page.getByRole('button', { name: 'Retake' }).click()
   await expect(page).toHaveURL(/\/$/)
@@ -62,6 +80,12 @@ test.describe('without camera access', () => {
       .first()
       .setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: PNG })
     await expect(page).toHaveURL(/\/review$/)
-    await expect(page.getByText('Uploaded image')).toBeVisible()
+    const details = page.getByRole('button', { name: 'Details' })
+    if (await details.isVisible()) await details.click()
+    await expect(
+      page
+        .getByRole('region', { name: 'Image quality' })
+        .getByText('Uploaded image'),
+    ).toBeVisible()
   })
 })
