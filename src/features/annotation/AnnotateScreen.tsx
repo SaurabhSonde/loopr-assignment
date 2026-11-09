@@ -229,12 +229,12 @@ const AnnotationEditor = ({ photo }: { photo: Photo }) => {
             onEditLabel={editLabel}
           />
           {annotations.length === 0 && !labeling && (
-            <p className="pointer-events-none absolute inset-x-0 top-4 mx-auto w-fit rounded-full bg-black/70 px-3 py-1.5 text-sm text-white">
+            <p className="pointer-events-none absolute inset-x-0 bottom-4 mx-auto w-fit rounded-full bg-black/70 px-3 py-1.5 text-sm text-white">
               Drag on the photo to draw a box
             </p>
           )}
           {hidden && (
-            <p className="pointer-events-none absolute inset-x-0 top-4 mx-auto w-fit rounded-full bg-black/70 px-3 py-1.5 text-sm text-white">
+            <p className="pointer-events-none absolute inset-x-0 bottom-4 mx-auto w-fit rounded-full bg-black/70 px-3 py-1.5 text-sm text-white">
               Boxes hidden · press H or the eye to show
             </p>
           )}

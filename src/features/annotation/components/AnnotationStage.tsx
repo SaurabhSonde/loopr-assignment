@@ -3,11 +3,13 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { cn } from '@/lib/utils'
 import { useFittedSize } from '../hooks/useFittedSize'
 import { useStageInteraction } from '../hooks/useStageInteraction'
+import { useZoomPan } from '../hooks/useZoomPan'
 import type { Annotation } from '../lib/editor'
 import type { Rect, Size } from '../lib/geometry'
 import { BoxShape } from './BoxShape'
 import { LabelChips } from './LabelChips'
 import { ResizeHandles } from './ResizeHandles'
+import { ZoomControls } from './ZoomControls'
 
 type AnnotationStageProps = {
   src: string
@@ -44,6 +46,8 @@ export const AnnotationStage = ({
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const fitted = useFittedSize(containerRef, imageSize)
+  const zoomPan = useZoomPan(containerRef, fitted)
+  const { zoom } = zoomPan.view
   const coarse = useMediaQuery('(pointer: coarse)')
   const { draft, handlers } = useStageInteraction({
     svgRef,
@@ -64,17 +68,26 @@ export const AnnotationStage = ({
   const ordered = shown
     .filter((annotation) => annotation.id !== selectedId)
     .toSorted((a, b) => area(b) - area(a))
-  const unit = fitted ? 1 / fitted.scale : 1
+  // Screen px per image px, including zoom; keeps handles a constant size.
+  const screenScale = fitted ? fitted.scale * zoom : 1
+  const unit = 1 / screenScale
 
   return (
     <div
       ref={containerRef}
-      className="relative flex size-full items-center justify-center overflow-hidden"
+      // touch-none: pinches here zoom the photo, not the page.
+      className="relative flex size-full touch-none items-center justify-center overflow-hidden"
+      {...zoomPan.handlers}
     >
       {fitted && (
         <div
-          className="relative"
-          style={{ width: fitted.width, height: fitted.height }}
+          className="relative shrink-0 will-change-transform"
+          style={{
+            width: fitted.width,
+            height: fitted.height,
+            transform: `translate(${zoomPan.view.x}px, ${zoomPan.view.y}px) scale(${zoom})`,
+            transformOrigin: '0 0',
+          }}
         >
           <img
             src={src}
@@ -133,17 +146,26 @@ export const AnnotationStage = ({
               />
             )}
           </svg>
-          {!hidden && fitted && (
+          {!hidden && (
             <LabelChips
               annotations={shown}
               imageSize={imageSize}
-              scale={fitted.scale}
+              scale={screenScale}
+              zoom={zoom}
               selectedId={selectedId}
               onEditLabel={onEditLabel}
             />
           )}
         </div>
       )}
+      <div className="absolute top-2 right-2">
+        <ZoomControls
+          zoom={zoom}
+          onZoomIn={zoomPan.zoomIn}
+          onZoomOut={zoomPan.zoomOut}
+          onFit={zoomPan.fit}
+        />
+      </div>
     </div>
   )
 }

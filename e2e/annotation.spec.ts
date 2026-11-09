@@ -180,3 +180,64 @@ test('deletes a box and brings it back from the toast', async ({ page }) => {
     .click()
   await expect(boxes).toHaveCount(1)
 })
+
+test('draws accurately while zoomed in', async ({ page }) => {
+  const stage = await openEditor(page)
+  await page.getByRole('button', { name: 'Zoom in' }).click()
+  await page.getByRole('button', { name: 'Zoom in' }).click()
+  await expect(page.getByRole('group', { name: 'Zoom' })).toContainText('225%')
+
+  // Draw across the middle of the visible area.
+  const area = await boundsOf(page.getByRole('main').locator('section').first())
+  const start = { x: area.x + area.width * 0.4, y: area.y + area.height * 0.4 }
+  const end = { x: area.x + area.width * 0.6, y: area.y + area.height * 0.6 }
+  await page.mouse.move(start.x, start.y)
+  await page.mouse.down()
+  await page.mouse.move(end.x, end.y, { steps: 8 })
+  await page.mouse.up()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('[data-annotation-id]')).toHaveCount(1)
+
+  // The stored box covers exactly the photo pixels that were under the pointer.
+  const result = await page.evaluate(
+    ([sx, sy, ex, ey]) => {
+      const img = document.querySelector<HTMLImageElement>(
+        'img[alt="Photo being annotated"]',
+      )!
+      const shape = document.querySelector<SVGRectElement>(
+        '[data-annotation-id] rect:last-of-type',
+      )!
+      const photo = img.getBoundingClientRect()
+      const toImage = (x: number, y: number) => ({
+        x: ((x - photo.left) / photo.width) * img.naturalWidth,
+        y: ((y - photo.top) / photo.height) * img.naturalHeight,
+      })
+      return {
+        expected: [toImage(sx, sy), toImage(ex, ey)],
+        actual: {
+          x: shape.x.baseVal.value,
+          y: shape.y.baseVal.value,
+          right: shape.x.baseVal.value + shape.width.baseVal.value,
+          bottom: shape.y.baseVal.value + shape.height.baseVal.value,
+        },
+        imagePxPerScreenPx: img.naturalWidth / photo.width,
+      }
+    },
+    [start.x, start.y, end.x, end.y],
+  )
+  // Within one screen pixel.
+  const tolerance = result.imagePxPerScreenPx
+  expect(Math.abs(result.actual.x - result.expected[0].x)).toBeLessThan(
+    tolerance,
+  )
+  expect(Math.abs(result.actual.y - result.expected[0].y)).toBeLessThan(
+    tolerance,
+  )
+  expect(Math.abs(result.actual.right - result.expected[1].x)).toBeLessThan(
+    tolerance,
+  )
+  expect(Math.abs(result.actual.bottom - result.expected[1].y)).toBeLessThan(
+    tolerance,
+  )
+  await expect(stage).toBeVisible()
+})

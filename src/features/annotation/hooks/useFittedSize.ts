@@ -33,5 +33,7 @@ export const useFittedSize = (
     width: content.width * scale,
     height: content.height * scale,
     scale,
+    /** The container's own size. */
+    stage: available,
   }
 }
