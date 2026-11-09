@@ -1,6 +1,6 @@
+import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 import { CheckIcon, InfoIcon, OctagonXIcon, RotateCcwIcon } from 'lucide-react'
-import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,9 +22,15 @@ const ReviewScreen = () => {
   const navigate = useNavigate()
   const pending = usePhotoStore((s) => s.pendingCapture)
   const discardPendingCapture = usePhotoStore((s) => s.discardPendingCapture)
+  const commitPendingCapture = usePhotoStore((s) => s.commitPendingCapture)
   const quality = useImageQuality(pending)
+  // Set while handing the photo to the editor, so the now-empty review
+  // screen doesn't redirect to the camera in the meantime.
+  const [opening, setOpening] = useState(false)
 
-  if (!pending || !quality.report) return <Navigate to="/" replace />
+  if (!pending || !quality.report) {
+    return opening ? null : <Navigate to="/" replace />
+  }
 
   const { report } = quality
   const poor = !quality.analyzing && report.overall === 'poor'
@@ -37,8 +43,10 @@ const ReviewScreen = () => {
   }
 
   const handleUsePhoto = () => {
-    // Saving to the gallery and opening the editor arrive in later phases.
-    toast.info('Annotation is coming next.')
+    setOpening(true)
+    const id = commitPendingCapture(quality.analyzing ? null : report)
+    // Replace, so going back from the editor returns to the camera.
+    if (id) navigate(`/annotate/${id}`, { replace: true })
   }
 
   const panel = (
