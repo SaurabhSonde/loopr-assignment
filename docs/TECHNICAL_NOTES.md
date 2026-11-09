@@ -2,6 +2,8 @@
 
 How the app captures photos, judges their quality and keeps annotations aligned. File references point to `src/`.
 
+**Live app:** https://loopr-assignment.vercel.app. Open it on a phone for the rear camera and torch. Setup and scripts are in the [README](../README.md).
+
 ## 1. Image capture strategy
 
 ### A fallback ladder

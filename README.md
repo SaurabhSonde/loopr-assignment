@@ -42,7 +42,7 @@ A React app that takes the highest-resolution photo the device and browser allow
 
 ## Quick start
 
-Requires **Node 24** and npm.
+To just try it, open **https://loopr-assignment.vercel.app** (camera access needs HTTPS, which the live site has). To run it locally you need **Node 24** and npm:
 
 ```bash
 npm install
